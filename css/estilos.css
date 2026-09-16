@@ -241,6 +241,7 @@
 
   .boton .flecha { transition: transform .18s ease; }
   .boton:hover .flecha { transform: translateX(4px); }
+  .boton.chico { padding: .6rem 1rem; font-size: .8rem; }
 
   /* marco del panel del hero con la demo */
   .marco-demo {
@@ -391,12 +392,12 @@
   html { scroll-behavior: auto; }
 }
 
-/* --- top 3 de la portada (ranking global) --- */
+/* --- ranking global de la portada (va debajo de la presentación) --- */
 @layer comps {
   .top3 {
     list-style: none; padding: 0; margin: 0;
     display: grid; gap: .5rem;
-    max-width: 520px;
+    max-width: 620px;
   }
   .top3 li {
     display: grid; grid-template-columns: 2.2rem 1fr auto;
@@ -414,5 +415,13 @@
   .top3 li .pts { font-family: var(--display); color: var(--ambar); }
   .top3 li.vacio {
     grid-template-columns: 1fr; color: var(--tenue); font-size: .92rem;
+  }
+  /* la fila del que está mirando, resaltada */
+  .top3 li.yo { border-color: var(--fosforo); background: rgba(74, 222, 128, .13); }
+  .top3 li.yo .nom { color: var(--fosforo-suave); }
+
+  .fila-ranking {
+    display: flex; flex-wrap: wrap; gap: .8rem; align-items: center;
+    margin-top: 1.4rem;
   }
 }

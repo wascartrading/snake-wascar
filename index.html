@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/estilos.css?v=2">
+<link rel="stylesheet" href="css/estilos.css?v=6">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
 </head>
 <body>
@@ -18,6 +18,7 @@
   <div class="envoltura barra-interna">
     <p class="marca"><span class="punto" aria-hidden="true"></span> SNAKE <span style="color:var(--tenue);font-family:var(--mono);font-size:.72rem;letter-spacing:.12em">v2026</span></p>
     <nav aria-label="Secciones">
+      <a href="#records">Ranking</a>
       <a href="#como">Cómo se juega</a>
       <a href="#controles">Controles</a>
       <a href="#detalles">Detalles</a>
@@ -76,6 +77,24 @@
     </div>
   </div>
 
+  <!-- ===== RANKING GLOBAL · en vivo =====
+       Orden del jefe (16/09/2026): bajando un poquito desde la presentación
+       aparece el top global actual. Se refresca solo, sin recargar nada. -->
+  <section class="envoltura" id="records">
+    <div class="cabeza-seccion">
+      <p class="etiqueta">Ranking global · en vivo</p>
+      <h2>El top global de ahora mismo</h2>
+      <p>Cada jugador deja su nombre al empezar y aquí queda su mejor puntuación. La lista se pone al día sola cada medio minuto.</p>
+    </div>
+    <ol class="top3" id="portada-top">
+      <li class="vacio">Cargando los récords…</li>
+    </ol>
+    <div class="fila-ranking">
+      <button class="boton secundario chico" id="btn-portada-refrescar" type="button">Actualizar</button>
+      <a class="boton chico" href="juego.html">Entrar al ranking <span class="flecha" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
   <!-- ===== CÓMO SE JUEGA ===== -->
   <section class="envoltura" id="como">
     <div class="cabeza-seccion">
@@ -120,7 +139,7 @@
     <div class="cabeza-seccion">
       <p class="etiqueta">Mandos</p>
       <h2>Con qué se maneja</h2>
-      <p>En la PC con el teclado; en el teléfono, deslizando el dedo o con la cruceta en pantalla.</p>
+      <p>En la PC con el teclado; en el teléfono, deslizando el dedo sobre el tablero.</p>
     </div>
 
     <div class="rejilla-2">
@@ -138,8 +157,8 @@
         <h3>Celular y tableta</h3>
         <ul class="lista-teclas" style="margin-top:.8rem">
           <li><b>Desliza</b> el dedo hacia donde quieras ir</li>
-          <li><b>Cruceta</b> en pantalla, abajo a la derecha</li>
           <li><b>Toque</b> en el tablero — pausa</li>
+          <li><b>Debajo</b> del tablero, el ranking global en vivo</li>
           <li><b>Respeta el tamaño</b>: el tablero se adapta solo</li>
         </ul>
       </div>
@@ -182,18 +201,6 @@
     </div>
   </section>
 
-  <!-- ===== RÉCORDS ===== -->
-  <section class="envoltura" id="records">
-    <div class="cabeza-seccion">
-      <p class="etiqueta">Ranking global</p>
-      <h2>Los tres mejores de todos</h2>
-      <p>Cada jugador deja su nombre al empezar y aquí queda su mejor puntuación.</p>
-    </div>
-    <ul class="top3" id="portada-top">
-      <li class="vacio">Cargando los récords…</li>
-    </ul>
-  </section>
-
   <!-- ===== CTA ===== -->
   <section class="envoltura">
     <div class="cta-final">
@@ -213,7 +220,7 @@
   </div>
 </footer>
 
-<script src="js/ranking.js?v=3" defer></script>
-<script src="js/demo.js?v=3" defer></script>
+<script src="js/ranking.js?v=6" defer></script>
+<script src="js/demo.js?v=6" defer></script>
 </body>
 </html>

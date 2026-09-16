@@ -3,7 +3,8 @@
    Serpiente autónoma (IA sencilla), movimiento interpolado.
    ============================================================ */
 
-const REJILLA = 20;                 // tamaño de celda en px
+const REJILLA = 30;                 // tamaño de celda en px (celdas grandes,
+                                    // como en el juego: la culebrita se ve)
 const canvas = document.getElementById("demo");
 const ctx = canvas.getContext("2d");
 
@@ -129,17 +130,19 @@ function dibujar(alfa) {
     ctx.beginPath(); ctx.moveTo(0, y + .5); ctx.lineTo(ancho, y + .5); ctx.stroke();
   }
 
-  // fruta con brillo
-  const fx = fruta.x * REJILLA, fy = fruta.y * REJILLA;
+  // fruta grande con halo hecho a mano (sin sombras difusas: más fluido)
+  const fx = fruta.x * REJILLA + REJILLA / 2;
+  const fy = fruta.y * REJILLA + REJILLA / 2;
   const latido = 1 + Math.sin(performance.now() / 260) * 0.08;
-  ctx.save();
-  ctx.shadowColor = "rgba(251,146,60,.85)";
-  ctx.shadowBlur = 18;
+  const rf = REJILLA * 0.42 * latido;
+  ctx.fillStyle = "rgba(251,146,60,.2)";
+  ctx.beginPath();
+  ctx.arc(fx, fy, rf * 1.5, 0, Math.PI * 2);
+  ctx.fill();
   ctx.fillStyle = "#fb923c";
   ctx.beginPath();
-  ctx.arc(fx + REJILLA / 2, fy + REJILLA / 2, (REJILLA / 2 - 2) * latido, 0, Math.PI * 2);
+  ctx.arc(fx, fy, rf, 0, Math.PI * 2);
   ctx.fill();
-  ctx.restore();
 
   // cola + cabeza con interpolación hacia la celda siguiente
   // cinta continua con curvas suaves (misma tecnica que el juego)
@@ -160,14 +163,6 @@ function dibujar(alfa) {
   ctx.save();
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
-  ctx.lineWidth = REJILLA * 0.8;
-  const deg = ctx.createLinearGradient(colaPt.x, colaPt.y, cabezaPt.x, cabezaPt.y);
-  deg.addColorStop(0, "#1c7f47");
-  deg.addColorStop(0.5, "#2fc46a");
-  deg.addColorStop(1, "#86efac");
-  ctx.strokeStyle = deg;
-  ctx.shadowColor = "rgba(74,222,128,.4)";
-  ctx.shadowBlur = 10;
   ctx.beginPath();
   ctx.moveTo(colaPt.x, colaPt.y);
   for (let i = n - 2; i >= 1; i--) {
@@ -176,18 +171,28 @@ function dibujar(alfa) {
     ctx.quadraticCurveTo(puntos[i].x, puntos[i].y, mx, my);
   }
   ctx.lineTo(cabezaPt.x, cabezaPt.y);
+  // halo con una segunda pasada ancha y tenue (sin sombras caras)
+  ctx.strokeStyle = "rgba(74,222,128,.16)";
+  ctx.lineWidth = REJILLA * 1.2;
+  ctx.stroke();
+  const deg = ctx.createLinearGradient(colaPt.x, colaPt.y, cabezaPt.x, cabezaPt.y);
+  deg.addColorStop(0, "#1c7f47");
+  deg.addColorStop(0.5, "#2fc46a");
+  deg.addColorStop(1, "#86efac");
+  ctx.strokeStyle = deg;
+  ctx.lineWidth = REJILLA * 0.92;
   ctx.stroke();
   ctx.restore();
 
   // cabeza
-  ctx.save();
-  ctx.fillStyle = "#b9f7d3";
-  ctx.shadowColor = "rgba(134,239,172,.85)";
-  ctx.shadowBlur = 14;
+  ctx.fillStyle = "rgba(134,239,172,.18)";
   ctx.beginPath();
-  ctx.arc(cabezaPt.x, cabezaPt.y, REJILLA * 0.4, 0, Math.PI * 2);
+  ctx.arc(cabezaPt.x, cabezaPt.y, REJILLA * 0.7, 0, Math.PI * 2);
   ctx.fill();
-  ctx.restore();
+  ctx.fillStyle = "#b9f7d3";
+  ctx.beginPath();
+  ctx.arc(cabezaPt.x, cabezaPt.y, REJILLA * 0.46, 0, Math.PI * 2);
+  ctx.fill();
 
   // ojos de la cabeza (alineados con la dirección)
   const sep = REJILLA * 0.17;

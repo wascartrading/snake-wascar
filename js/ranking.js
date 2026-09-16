@@ -31,6 +31,11 @@
   const avisoRanking = document.getElementById("aviso-ranking");
   const elFinRanking = document.getElementById("fin-ranking");
   const elPortadaTop = document.getElementById("portada-top");
+  /* panel del ranking pegado al área de juego (orden del jefe, 16/09/2026) */
+  const panelLista = document.getElementById("panel-ranking-lista");
+  const panelSub = document.getElementById("panel-ranking-sub");
+  const panelAviso = document.getElementById("panel-ranking-aviso");
+  const btnPanelRefrescar = document.getElementById("btn-panel-refrescar");
 
   const permitido = /^[A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ ._\-]+$/;
   const medallas = ["🥇", "🥈", "🥉"];
@@ -118,8 +123,58 @@
     }
   }
 
-  async function abrirRanking() {
-    if (!capaRanking) return;
+  /* ---------- listas en vivo ----------
+     Una fila del ranking: medalla (o el número), nombre y puntos. */
+  function filaRanking(e) {
+    const premio = medallas[e.puesto - 1] || e.puesto;
+    return '<li class="' + (esMio(e.nombre) ? "yo" : "") + '">' +
+      '<span class="pos">' + premio + '</span>' +
+      '<span class="nom">' + escapar(e.nombre) + '</span>' +
+      '<span class="pts">' + e.puntos + '</span>' +
+      '</li>';
+  }
+
+  function pintarEn(elemento, datos, cuantas) {
+    if (!elemento) return;
+    const top = (datos.top || []).slice(0, cuantas);
+    elemento.innerHTML = top.length
+      ? top.map(filaRanking).join("")
+      : '<li class="vacio">Todavía no hay récords. ¡Sea el primero!</li>';
+  }
+
+  function resumenRanking(datos) {
+    const total = datos.jugadores === 1
+      ? "1 jugador" : (datos.jugadores || 0) + " jugadores";
+    let linea = total + " en el ranking global";
+    if (miPuesto) linea += " · usted va " + miPuesto + "º";
+    return linea;
+  }
+
+  /* Trae el ranking UNA vez y refresca todo lo que lo enseña: el panel que va
+     debajo del área de juego y la lista de la portada. Se llama al cargar,
+     cada 30 segundos, al volver a la pestaña y —lo que pidió el jefe— cada
+     vez que alguien mejora su propio récord. */
+  let trayendo = false;
+  async function refrescarListas() {
+    if ((!panelLista && !elPortadaTop) || trayendo) return;
+    trayendo = true;
+    try {
+      const datos = await traerRanking();
+      pintarEn(panelLista, datos, 10);
+      pintarEn(elPortadaTop, datos, 10);
+      if (panelSub) panelSub.textContent = resumenRanking(datos);
+      mostrarAviso(panelAviso, "");
+    } catch (e) {
+      if (panelAviso && !(panelLista && panelLista.children.length)) {
+        mostrarAviso(panelAviso,
+          "No pude traer el ranking (¿sin conexión?). Vuelvo a intentarlo solo.");
+      }
+    } finally {
+      trayendo = false;
+    }
+  }
+
+  async function abrirRanking() {    if (!capaRanking) return;
     if (typeof window.pausarSiJugando === "function") window.pausarSiJugando();
     capa("ranking");
     capaRanking.hidden = false;
@@ -193,6 +248,7 @@
         elFinRanking.textContent = d.nuevo
           ? `¡Entró al ranking! Puesto ${d.puesto} de ${total}.`
           : `Su récord sigue en ${d.mejor}. Va ${d.puesto}º de ${total}.`;
+        refrescarListas();   // el panel de abajo se pone al día al instante
       } catch (e) {
         elFinRanking.textContent = "No pude guardar el puntaje (¿sin conexión?).";
       }
@@ -201,6 +257,7 @@
     abrir: abrirRanking,
     cerrar: cerrarRanking,
     cambiarNombre: pedirNombre,
+    refrescarListas: refrescarListas,
     nombre: () => nombre,
     bloqueando: () => bloqueando,
   };
@@ -235,22 +292,19 @@
     if (ev.key === "Escape" && capaRanking && !capaRanking.hidden) cerrarRanking();
   });
 
-  /* ---------- portada: pequeño top 3 ---------- */
-  if (elPortadaTop) {
-    (async () => {
-      try {
-        const datos = await traerRanking();
-        const top = (datos.top || []).slice(0, 3);
-        if (!top.length) {
-          elPortadaTop.innerHTML = '<p class="vacio">Todavía no hay récords. ¡Sea el primero!</p>';
-        } else {
-          elPortadaTop.innerHTML = top.map((e) =>
-            `<li><span class="pos">${medallas[e.puesto - 1] || e.puesto}</span>` +
-            `<span class="nom">${escapar(e.nombre)}</span>` +
-            `<span class="pts">${e.puntos}</span></li>`
-          ).join("");
-        }
-      } catch (e) { /* sin conexión: no se enseña nada, sin ruido */ }
-    })();
+  /* ---------- listas en vivo: primera carga y repaso periódico ----------
+     El jefe lo pidió así: el ranking del área de juego tiene que refrescarse
+     solo cada vez que alguien rompa su récord, y también en la portada. */
+  const btnPortadaRefrescar = document.getElementById("btn-portada-refrescar");
+  if (panelLista || elPortadaTop) {
+    refrescarListas();                       // al abrir la página
+    setInterval(() => {                      // repaso cada 30 s
+      if (!document.hidden) refrescarListas();
+    }, 30000);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) refrescarListas();   // al volver a la pestaña
+    });
+    if (btnPanelRefrescar) btnPanelRefrescar.addEventListener("click", refrescarListas);
+    if (btnPortadaRefrescar) btnPortadaRefrescar.addEventListener("click", refrescarListas);
   }
 })();

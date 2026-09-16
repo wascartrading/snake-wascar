@@ -62,10 +62,10 @@
     position: sticky; top: 0; z-index: 10;
   }
   .barra-interna {
-    width: min(1080px, 100% - 2rem);
+    width: min(1180px, 100% - 2rem);
     margin-inline: auto;
     display: flex; align-items: center; justify-content: space-between;
-    gap: 1rem; padding-block: .8rem;
+    gap: 1rem; padding-block: .6rem;
   }
   .marca {
     display: flex; align-items: center; gap: .6rem;
@@ -78,20 +78,27 @@
   }
 
   main {
-    width: min(1080px, 100% - 2rem);
+    width: min(1180px, 100% - 2rem);
     margin-inline: auto;
-    padding-block: 1.2rem 2rem;
+    padding-block: .7rem 1.1rem;
     display: grid;
-    gap: 1rem;
+    gap: .8rem;
     align-content: start;
   }
 
   .zona-juego {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 250px;
-    gap: 1.1rem;
+    grid-template-columns: minmax(0, 1fr) 232px;
+    /* el ranking manda debajo del área de juego (orden del jefe, 16/09/2026) */
+    grid-template-areas:
+      "tablero lateral"
+      "ranking ranking";
+    gap: 1rem;
     align-items: start;
   }
+  .marco-tablero { grid-area: tablero; }
+  .lateral { grid-area: lateral; }
+  .panel-ranking { grid-area: ranking; }
 
   .pie {
     border-top: 1px solid var(--linea);
@@ -99,7 +106,7 @@
     font-size: .8rem;
   }
   .pie-interno {
-    width: min(1080px, 100% - 2rem); margin-inline: auto;
+    width: min(1180px, 100% - 2rem); margin-inline: auto;
     padding-block: 1rem;
     display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; justify-content: space-between;
   }
@@ -116,7 +123,7 @@
   .dato {
     border: 1px solid var(--linea);
     background: linear-gradient(180deg, var(--panel-alto), var(--panel));
-    padding: .6rem .75rem;
+    padding: .55rem .7rem;
     clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
   }
   .dato .etiqueta-dato {
@@ -130,27 +137,34 @@
   .dato.acento .valor { color: var(--ambar); }
 
   /* --- tablero --- */
+  /* El marco se ajusta EXACTAMENTE al tablero (antes se estiraba a todo el
+     ancho de la columna y dejaba una banda vacía alrededor del juego).
+     ZOOM (16/09/2026): como el tablero bajó a 16 casillas, ahora el marco se
+     lleva TODO el alto disponible de la pantalla y todo el ancho de su
+     columna: el juego manda, el adorno estorba lo mínimo. */
   .marco-tablero {
     position: relative;
+    width: min(100%, calc(100dvh - 226px), 960px);
+    margin-inline: auto;
     border: 1px solid var(--linea-fuerte);
     background: #04100a;
-    padding: .6rem;
+    padding: .5rem;
     box-shadow: inset 0 0 60px rgba(74, 222, 128, .05), 0 30px 60px -34px rgba(0, 0, 0, .95);
     clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
   }
 
+  /* El tablero llena su marco: cuadrado perfecto, sin deformarse. */
   #tablero {
     width: 100%;
     aspect-ratio: 1 / 1;
-    max-height: min(66dvh, 620px);
-    margin-inline: auto;
+    height: auto;
     background: #04100a;
     touch-action: none;      /* que el deslizamiento no haga scroll */
   }
 
   /* --- capas de mensaje --- */
   .capa {
-    position: absolute; inset: .6rem;
+    position: absolute; inset: 0;    /* tapa el tablero entero, no solo su relleno */
     display: grid; place-content: center; gap: .55rem;
     text-align: center;
     background: color-mix(in srgb, #04100a 82%, transparent);
@@ -223,7 +237,10 @@
     color: var(--fosforo-suave);
   }
 
-  /* --- cruceta táctil --- */
+  /* --- cruceta táctil: APARCADA (orden del jefe, 16/09/2026) ---
+     Los mandos de flechas salieron del área de juego para dejarle el sitio al
+     ranking: el juego se maneja deslizando el dedo sobre el tablero. Estos
+     estilos quedan aquí, listos para restaurarlos si algún día los quiere. */
   .cruceta {
     display: none;
     grid-template-columns: repeat(3, 58px);
@@ -260,7 +277,6 @@
 
 /* --- adaptaciones --- */
 @media (hover: none) and (pointer: coarse) {
-  .cruceta { display: grid; }
   /* el texto de ayuda cambia: en tactil se habla del dedo, no del teclado */
   .solo-teclado { display: none; }
   .solo-tactil { display: block; }
@@ -269,26 +285,35 @@
 }
 
 @media (max-width: 900px) {
-  .zona-juego { grid-template-columns: 1fr; }
+  .zona-juego {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "tablero"
+      "ranking"
+      "lateral";
+  }
   .hud { gap: .5rem; }
   .lateral { grid-auto-flow: row; }
 }
 
 /* --- teléfono en vertical: cabe todo, se juega con el pulgar --- */
 @media (max-width: 620px) {
-  main { width: min(1080px, 100% - 1rem); padding-block: .5rem .8rem; gap: .5rem; }
-  .barra-interna { padding-block: .45rem; }
+  /* menos adornos alrededor = más tablero (el juego manda, no el marco) */
+  main { width: 100%; padding-inline: .1rem; padding-block: .25rem .45rem; gap: .35rem; }
+  .barra-interna { padding-block: .35rem; }
   .marca { font-size: .78rem; letter-spacing: .1em; }
   .barra-acciones .boton { padding: .4rem .55rem; font-size: .68rem; }
 
   .hud { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .3rem; }
-  .dato { padding: .32rem .42rem; clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px); }
+  .dato { padding: .3rem .4rem; clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px); }
   .dato .etiqueta-dato { font-size: .5rem; letter-spacing: .08em; }
   .dato .valor { font-size: .98rem; }
 
-  .marco-tablero { padding: .4rem; }
-  /* el tablero se queda con lo que sobra: HUD arriba, acciones y cruceta abajo */
-  #tablero { max-height: calc(100dvh - 350px); }
+  /* el tablero se queda con TODO el ancho y con lo que sobra de alto:
+     HUD arriba, acciones y cruceta abajo (marco casi sin relleno) */
+  .marco-tablero { width: min(100%, calc(100dvh - 248px)); padding: .18rem; }
+  /* el pie estorba en el teléfono: fuera, y el tablero gana altura */
+  .pie { display: none; }
 
   /* barra compacta y textos de dedo */
   .sufijo, .largo { display: none; }
@@ -297,27 +322,36 @@
   .solo-tactil { display: block; }
 
   .lateral { grid-template-columns: 1fr; }
-  .lateral .caja:nth-child(2), .lateral .caja:nth-child(3) { display: none; }
+  /* en el teléfono solo queda la caja de acciones: así el tablero, los mandos
+     y los marcadores caben en la pantalla SIN tener que deslizar */
+  .lateral .caja:nth-child(2),
+  .lateral .caja:nth-child(3),
+  .lateral .caja:nth-child(4) { display: none; }
   .caja { padding: .6rem; }
 
-  .cruceta { grid-template-columns: repeat(3, minmax(58px, 82px)); grid-template-rows: repeat(3, 58px); gap: .35rem; }
-  /* en pantalla de telefono la cruceta va SIEMPRE visible (no solo si el
-     navegador declara puntero tactil) */
-  .cruceta { display: grid; }
   .capa h2 { font-size: 1.3rem; }
   .capa p { font-size: .85rem; }
   .pie { font-size: .7rem; }
   .pie-interno { padding-block: .6rem; }
 }
 
-/* --- teléfono apaisado: tablero a la izquierda, mandos a la derecha --- */
+/* --- teléfono apaisado: tablero a la izquierda, mandos a la derecha ---
+   ZOOM (16/09/2026): aquí el tablero se quedaba pequeñísimo porque la cruceta
+   de 3 filas se comía el alto. Ahora es UNA sola fila de flechas y todo el
+   adorno se compacta, así el tablero gana casi 60 px de lado. */
 @media (orientation: landscape) and (max-height: 560px) {
   .barra { position: static; }
-  main { padding-block: .35rem .5rem; gap: .45rem; }
-  .zona-juego { grid-template-columns: minmax(0, 1fr) 180px; gap: .5rem; }
-  #tablero { max-height: calc(100dvh - 170px); }
+  .barra-interna { padding-block: .25rem; }
+  .marca { font-size: .8rem; }
+  main { padding-block: .3rem .4rem; gap: .35rem; }
+  .zona-juego { grid-template-columns: minmax(0, 1fr) 176px; gap: .5rem; }
+  /* sin cruceta el tablero se lleva casi todo el alto de la pantalla */
+  .marco-tablero { width: min(100%, calc(100dvh - 116px)); padding: .3rem; }
   .lateral .caja:nth-child(3), .lateral .caja:nth-child(4) { display: none; }
-  .hud { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .hud { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .35rem; }
+  .dato { padding: .3rem .45rem; }
+  .dato .valor { font-size: 1.05rem; }
+  .pie { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -385,6 +419,49 @@
     color: var(--fosforo-suave); margin-bottom: .55rem;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
+
+  /* --- panel del ranking: va pegado debajo del área de juego --- */
+  .panel-ranking {
+    border: 1px solid var(--linea);
+    background: linear-gradient(180deg, var(--panel-alto), var(--panel));
+    padding: .9rem;
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  }
+  .panel-cabeza {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: .6rem; flex-wrap: wrap;
+  }
+  .panel-cabeza h3 {
+    font-family: var(--display); font-size: .84rem; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--tenue);
+  }
+  .vivo {
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-family: var(--mono); font-size: .64rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--fosforo);
+  }
+  .punto-vivo {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--fosforo);
+    box-shadow: 0 0 10px var(--fosforo);
+    animation: latidoVivo 1.8s ease-in-out infinite;
+  }
+  .panel-ranking .sub {
+    font-family: var(--mono); font-size: .74rem; color: var(--tenue);
+    margin-top: .2rem;
+  }
+  /* la lista del panel es más ancha que la del cartel: caben los diez */
+  .panel-ranking .ranking {
+    width: min(620px, 100%);
+    max-height: none;
+    margin-top: .8rem;
+  }
+  .panel-ranking .aviso { margin-inline: 0; text-align: left; margin-top: .5rem; }
+  .panel-pie { display: flex; justify-content: flex-end; margin-top: .8rem; }
+}
+
+@keyframes latidoVivo {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .22; }
 }
 
 @media (max-width: 620px) {
@@ -392,4 +469,8 @@
   .form-nombre { width: min(235px, 100%); }
   .ranking { max-height: 42vh; width: 100%; }
   .ranking li { font-size: .8rem; padding: .36rem .5rem; }
+  /* el ranking va justo debajo del tablero: con poco relleno y bien legible */
+  .panel-ranking { padding: .7rem; }
+  .panel-ranking .ranking { margin-top: .6rem; }
+  .panel-ranking .ranking-largo { max-height: none; }
 }

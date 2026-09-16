@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/juego.css?v=2">
+<link rel="stylesheet" href="css/juego.css?v=6">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
 </head>
 <body>
@@ -87,6 +87,25 @@
       </div>
     </div>
 
+    <!-- ===== RANKING GLOBAL EN VIVO (orden del jefe, 16/09/2026) =====
+         Va pegado debajo del área de juego. Los mandos de flechas se fueron:
+         se juega deslizando el dedo, y en su sitio manda el ranking, que se
+         refresca solo cada 30 s y cada vez que alguien rompe su récord. -->
+    <section class="panel-ranking" id="panel-ranking" aria-label="Ranking global en vivo">
+      <div class="panel-cabeza">
+        <h3>🏆 Ranking global</h3>
+        <span class="vivo"><span class="punto-vivo" aria-hidden="true"></span> en vivo</span>
+      </div>
+      <p class="sub" id="panel-ranking-sub">Cargando…</p>
+      <ol class="ranking ranking-largo" id="panel-ranking-lista">
+        <li class="vacio">Cargando los récords…</li>
+      </ol>
+      <p class="aviso" id="panel-ranking-aviso" hidden></p>
+      <div class="panel-pie">
+        <button class="boton fantasma pequeno" id="btn-panel-refrescar" type="button">Actualizar</button>
+      </div>
+    </section>
+
     <aside class="lateral">
       <div class="caja">
         <h3>Acciones</h3>
@@ -119,20 +138,14 @@
         <h3>En el celular</h3>
         <ul class="ayuda">
           <li>Desliza el dedo sobre el tablero para girar.</li>
-          <li>Usa la cruceta de abajo si lo prefiere.</li>
           <li>Un toque en el tablero pausa la partida.</li>
+          <li>Debajo del tablero va el ranking en vivo.</li>
         </ul>
       </div>
     </aside>
   </section>
 
-  <nav class="cruceta" aria-label="Controles táctiles">
-    <button class="arriba" type="button" data-dir="arriba" aria-label="Arriba">▲</button>
-    <button class="izq" type="button" data-dir="izquierda" aria-label="Izquierda">◀</button>
-    <button class="centro" type="button" data-dir="pausa" aria-label="Pausa">❚❚</button>
-    <button class="der" type="button" data-dir="derecha" aria-label="Derecha">▶</button>
-    <button class="abajo" type="button" data-dir="abajo" aria-label="Abajo">▼</button>
-  </nav>
+  </section>
 </main>
 
 <footer class="pie">
@@ -142,7 +155,7 @@
   </div>
 </footer>
 
-<script src="js/ranking.js?v=3" defer></script>
-<script src="js/juego.js?v=3" defer></script>
+<script src="js/ranking.js?v=6" defer></script>
+<script src="js/juego.js?v=6" defer></script>
 </body>
 </html>
