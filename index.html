@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SNAKE · La Culebrita — juega ya</title>
+<meta name="description" content="La culebrita clásica, pulida: velocidad progresiva, récord guardado y controles para teclado y celular. Un juego de JARVIS.">
+<meta name="theme-color" content="#060b09">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/estilos.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+
+<header class="barra">
+  <div class="envoltura barra-interna">
+    <p class="marca"><span class="punto" aria-hidden="true"></span> SNAKE <span style="color:var(--tenue);font-family:var(--mono);font-size:.72rem;letter-spacing:.12em">v2026</span></p>
+    <nav aria-label="Secciones">
+      <a href="#como">Cómo se juega</a>
+      <a href="#controles">Controles</a>
+      <a href="#detalles">Detalles</a>
+      <a href="juego.html">Jugar</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ===== HERO ===== -->
+  <section class="envoltura heroe">
+    <div class="aparece">
+      <p class="etiqueta">Arcade · un jugador · sin instalar</p>
+      <h1 class="titulo-grande">SNAKE<span>.</span></h1>
+      <p class="bajada">
+        La culebrita de toda la vida, con el pulido de hoy: crece, acelera y no te
+        choques. Récord guardado y controles para teclado <em>y</em> para el celular.
+      </p>
+
+      <p class="firma">
+        Creado por <strong>Wáscar</strong> · construido por <strong>JARVIS</strong>
+      </p>
+
+      <div class="acciones">
+        <a class="boton" href="juego.html">
+          Jugar ahora <span class="flecha" aria-hidden="true">→</span>
+        </a>
+        <a class="boton secundario" href="#como">Ver cómo se juega</a>
+      </div>
+
+      <div class="tira-datos">
+        <span>TU RÉCORD: <b id="dato-record">—</b></span>
+        <span>PARTIDAS: <b id="dato-partidas">0</b></span>
+        <span>ÚLTIMA: <b id="dato-ultima">—</b></span>
+      </div>
+    </div>
+
+    <div class="marco-demo aparece retardo-2">
+      <div class="rotulo">
+        <span>demo en vivo</span>
+        <span class="vivo">● jugando sola</span>
+      </div>
+      <canvas id="demo" width="640" height="400" aria-label="Demostración automática del juego de la culebrita"></canvas>
+      <div class="rotulo" style="padding-top:.7rem;padding-bottom:0">
+        <span>la culebrita se mueve sola</span>
+        <span>pulsa jugar →</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CINTA ===== -->
+  <div class="cinta" aria-hidden="true">
+    <div class="cinta-interna" id="cinta">
+      <span>◆ come crece ◆ come crece ◆ come crece ◆ come crece ◆ come crece ◆ come crece ◆ come crece ◆ come crece ◆</span>
+      <span>◆ come crece ◆ come crece ◆ come crece ◆ come crece ◆ come crece ◆ come crece ◆ come crece ◆ come crece ◆</span>
+    </div>
+  </div>
+
+  <!-- ===== CÓMO SE JUEGA ===== -->
+  <section class="envoltura" id="como">
+    <div class="cabeza-seccion">
+      <p class="etiqueta">Reglas de la casa</p>
+      <h2>Tres gestos y ya sabes jugar</h2>
+      <p>Nada de tutoriales. Es el juego más honesto que existe: tu única enemiga es tu propia cola.</p>
+    </div>
+
+    <div class="rejilla-3">
+      <article class="tarjeta">
+        <span class="numero" aria-hidden="true">01</span>
+        <svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <path d="M12 3v18M3 12h18" stroke-linecap="round"/>
+          <path d="M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>
+        </svg>
+        <h3>Muévete</h3>
+        <p>Flechas o W A S D. La culebrita gira al instante, sin frenos ni inercia: puro reflejo.</p>
+      </article>
+
+      <article class="tarjeta">
+        <span class="numero" aria-hidden="true">02</span>
+        <svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <circle cx="12" cy="13" r="7"/><path d="M12 8c0-2 1-3 2-4M12 8c-.6-1.6-1.6-2.4-3-3" stroke-linecap="round"/>
+        </svg>
+        <h3>Come y crece</h3>
+        <p>Cada fruta suma un punto y un tramo de cola. Cada cinco frutas, un nivel: la cosa se pone rápida.</p>
+      </article>
+
+      <article class="tarjeta">
+        <span class="numero" aria-hidden="true">03</span>
+        <svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <path d="M6 3h12v5a6 6 0 0 1-12 0V3Z"/><path d="M9 21h6M12 14v7" stroke-linecap="round"/>
+        </svg>
+        <h3>No te choques</h3>
+        <p>Los muros y tu propio cuerpo matan. Si te enredas, es tu culpa: aquí no hay excusas.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== CONTROLES ===== -->
+  <section class="envoltura" id="controles">
+    <div class="cabeza-seccion">
+      <p class="etiqueta">Mandos</p>
+      <h2>Con qué se maneja</h2>
+      <p>En la PC con el teclado; en el teléfono, deslizando el dedo o con la cruceta en pantalla.</p>
+    </div>
+
+    <div class="rejilla-2">
+      <div class="tarjeta">
+        <h3>Teclado</h3>
+        <ul class="lista-teclas" style="margin-top:.8rem">
+          <li><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> <b>o</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> — mover</li>
+          <li><kbd>Espacio</kbd> — pausa y reanudar</li>
+          <li><kbd>Enter</kbd> — empezar o reintentar</li>
+          <li><kbd>R</kbd> — partida nueva</li>
+          <li><kbd>M</kbd> — quitar o poner el sonido</li>
+        </ul>
+      </div>
+      <div class="tarjeta">
+        <h3>Celular y tableta</h3>
+        <ul class="lista-teclas" style="margin-top:.8rem">
+          <li><b>Desliza</b> el dedo hacia donde quieras ir</li>
+          <li><b>Cruceta</b> en pantalla, abajo a la derecha</li>
+          <li><b>Toque</b> en el tablero — pausa</li>
+          <li><b>Respeta el tamaño</b>: el tablero se adapta solo</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DETALLES ===== -->
+  <section class="envoltura" id="detalles">
+    <div class="cabeza-seccion">
+      <p class="etiqueta">Lo que lleva dentro</p>
+      <h2>Pequeño por fuera, cuidado por dentro</h2>
+      <p>Todo escrito a mano: ni librerías ni dependencias. Abre y juega.</p>
+    </div>
+
+    <div class="rejilla-3">
+      <article class="tarjeta">
+        <h3>Movimiento suave</h3>
+        <p>El paso avanza a saltos, pero se dibuja interpolado: se ve fluido en cualquier pantalla, a 60 imágenes por segundo.</p>
+      </article>
+      <article class="tarjeta">
+        <h3>Memoria de récord</h3>
+        <p>Tu mejor puntuación y tus partidas quedan guardadas en el navegador. La próxima vez te espera ahí.</p>
+      </article>
+      <article class="tarjeta">
+        <h3>Sonido de verdad</h3>
+        <p>Los tonos se generan al vuelo (sin archivos de audio): un pitido al comer y un tono grave al caer.</p>
+      </article>
+      <article class="tarjeta">
+        <h3>Sin instalar nada</h3>
+        <p>Un archivo HTML y su JavaScript. Funciona sin internet, incluso en el celular.</p>
+      </article>
+      <article class="tarjeta">
+        <h3>Reto progresivo</h3>
+        <p>Cada cinco frutas la velocidad sube. Los valientes aguantan el nivel diez; los héroes, más.</p>
+      </article>
+      <article class="tarjeta">
+        <h3>Pausa honesta</h3>
+        <p>Se pausa solo si cambias de pestaña. Nada de perder por mirar el móvil.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="envoltura">
+    <div class="cta-final">
+      <div>
+        <h2>¿Se atreve, jefe?</h2>
+        <p>Le espera el tablero. La culebrita no perdona.</p>
+      </div>
+      <a class="boton" href="juego.html">Jugar ahora <span class="flecha" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="envoltura pie-interno">
+    <span>Un juego creado por <strong>Wáscar</strong> y construido por <strong>JARVIS</strong> · 2026</span>
+    <span>Sin dependencias · funciona sin conexión</span>
+  </div>
+</footer>
+
+<script src="js/demo.js" defer></script>
+</body>
+</html>

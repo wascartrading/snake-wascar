@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>SNAKE · Jugar — La Culebrita</title>
+<meta name="description" content="Juega a la culebrita: velocidad progresiva, récord guardado y controles para teclado y celular.">
+<meta name="theme-color" content="#060b09">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/juego.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+
+<header class="barra">
+  <div class="barra-interna">
+    <p class="marca"><span class="punto" aria-hidden="true"></span> SNAKE <span class="sufijo">· jugando</span></p>
+    <div class="barra-acciones">
+      <button class="boton fantasma pequeno" id="btn-pantalla" type="button"><span class="largo">Pantalla completa</span><span class="corto">⛶ Pantalla</span></button>
+      <a class="boton fantasma pequeno" href="index.html">← Volver</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hud" aria-label="Marcadores">
+    <div class="dato"><span class="etiqueta-dato">Puntos</span><span class="valor" id="puntos">0</span></div>
+    <div class="dato acento"><span class="etiqueta-dato">Récord</span><span class="valor" id="record">0</span></div>
+    <div class="dato"><span class="etiqueta-dato">Nivel</span><span class="valor" id="nivel">1</span></div>
+    <div class="dato"><span class="etiqueta-dato">Velocidad</span><span class="valor" id="velocidad">1.0x</span></div>
+  </section>
+
+  <section class="zona-juego">
+    <div class="marco-tablero" id="marco">
+      <canvas id="tablero" width="720" height="720" aria-label="Tablero del juego de la culebrita"></canvas>
+
+      <!-- capa de inicio -->
+      <div class="capa" id="capa-inicio">
+        <h2>¿Listo, jefe?</h2>
+        <p class="solo-teclado">Flechas o <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> para moverse · <kbd>Espacio</kbd> pausa</p>
+        <p class="solo-tactil">Desliza el dedo para girar · toca el tablero para pausar</p>
+        <p class="credito">Creado por <strong>Wáscar</strong> · construido por <strong>JARVIS</strong></p>
+        <button class="boton" id="btn-empezar" type="button">Empezar a jugar</button>
+      </div>
+
+      <!-- capa de pausa -->
+      <div class="capa" id="capa-pausa" hidden>
+        <h2>En pausa</h2>
+        <p>La culebrita le espera, sin prisa.</p>
+        <button class="boton" id="btn-seguir" type="button">Seguir jugando</button>
+      </div>
+
+      <!-- capa de fin -->
+      <div class="capa" id="capa-fin" hidden>
+        <h2>Se acabó</h2>
+        <p>Puntuación de esta partida</p>
+        <p class="destacado" id="fin-puntos">0</p>
+        <p id="fin-mensaje">¡Buen intento!</p>
+        <button class="boton" id="btn-otra" type="button">Jugar otra vez</button>
+      </div>
+    </div>
+
+    <aside class="lateral">
+      <div class="caja">
+        <h3>Acciones</h3>
+        <div class="fila">
+          <button class="boton fantasma pequeno" id="btn-pausa" type="button">Pausa</button>
+          <button class="boton fantasma pequeno" id="btn-reiniciar" type="button">Reiniciar</button>
+          <button class="boton fantasma pequeno" id="btn-sonido" type="button" aria-pressed="false">Sonido: sí</button>
+        </div>
+      </div>
+
+      <div class="caja">
+        <h3>Cómo se juega</h3>
+        <ul class="ayuda">
+          <li><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> o <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> — mover</li>
+          <li><kbd>Espacio</kbd> — pausa / seguir</li>
+          <li><kbd>Enter</kbd> — empezar o reintentar</li>
+          <li><kbd>R</kbd> — partida nueva</li>
+          <li><kbd>M</kbd> — sonido</li>
+        </ul>
+      </div>
+
+      <div class="caja">
+        <h3>En el celular</h3>
+        <ul class="ayuda">
+          <li>Desliza el dedo sobre el tablero para girar.</li>
+          <li>Usa la cruceta de abajo si lo prefiere.</li>
+          <li>Un toque en el tablero pausa la partida.</li>
+        </ul>
+      </div>
+    </aside>
+  </section>
+
+  <nav class="cruceta" aria-label="Controles táctiles">
+    <button class="arriba" type="button" data-dir="arriba" aria-label="Arriba">▲</button>
+    <button class="izq" type="button" data-dir="izquierda" aria-label="Izquierda">◀</button>
+    <button class="centro" type="button" data-dir="pausa" aria-label="Pausa">❚❚</button>
+    <button class="der" type="button" data-dir="derecha" aria-label="Derecha">▶</button>
+    <button class="abajo" type="button" data-dir="abajo" aria-label="Abajo">▼</button>
+  </nav>
+</main>
+
+<footer class="pie">
+  <div class="pie-interno">
+    <span>Creado por <strong>Wáscar</strong> · construido por <strong>JARVIS</strong> · 2026</span>
+    <span>Récord guardado en este navegador</span>
+  </div>
+</footer>
+
+<script src="js/juego.js" defer></script>
+</body>
+</html>

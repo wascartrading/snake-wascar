@@ -1,0 +1,325 @@
+/* ============================================================
+   SNAKE · La Culebrita — estilos de la sala de juego
+   ============================================================ */
+
+@layer reset, base, layout, comps;
+
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; }
+  * { margin: 0; padding: 0; }
+  img, canvas { display: block; max-width: 100%; }
+  button, a { font: inherit; color: inherit; }
+  ul { list-style: none; }
+}
+
+@layer base {
+  :root {
+    --fondo:         #060b09;
+    --fondo-2:       #0a1310;
+    --panel:         #0c1714;
+    --panel-alto:    #101f1a;
+    --fosforo:       #4ade80;
+    --fosforo-suave: #86efac;
+    --ambar:         #fbbf24;
+    --naranja:       #fb923c;
+    --rojo:          #f87171;
+    --texto:         #dcf5e6;
+    --tenue:         #7ea593;
+    --linea:         rgba(74, 222, 128, .16);
+    --linea-fuerte:  rgba(74, 222, 128, .34);
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --cuerpo:  "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+    --mono:    "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+  }
+
+  body {
+    font-family: var(--cuerpo);
+    color: var(--texto);
+    min-height: 100dvh;
+    background: var(--fondo);
+    background-image:
+      radial-gradient(900px 500px at 80% -10%, rgba(74, 222, 128, .12), transparent 70%),
+      radial-gradient(700px 400px at 0% 110%, rgba(251, 146, 60, .07), transparent 70%),
+      linear-gradient(rgba(74, 222, 128, .04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74, 222, 128, .04) 1px, transparent 1px);
+    background-size: auto, auto, 34px 34px, 34px 34px;
+    background-attachment: fixed;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow-x: hidden;
+  }
+
+  h1, h2 { font-family: var(--display); font-weight: 700; line-height: 1.05; letter-spacing: -.02em; }
+  ::selection { background: var(--fosforo); color: #04120a; }
+  :focus-visible { outline: 3px solid var(--ambar); outline-offset: 3px; border-radius: 4px; }
+}
+
+@layer layout {
+  .barra {
+    border-bottom: 1px solid var(--linea);
+    background: color-mix(in srgb, var(--fondo) 80%, transparent);
+    backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .barra-interna {
+    width: min(1080px, 100% - 2rem);
+    margin-inline: auto;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; padding-block: .8rem;
+  }
+  .marca {
+    display: flex; align-items: center; gap: .6rem;
+    font-family: var(--display); letter-spacing: .16em; text-transform: uppercase;
+    font-size: .95rem;
+  }
+  .marca .punto {
+    width: 11px; height: 11px; background: var(--fosforo);
+    box-shadow: 0 0 14px var(--fosforo);
+  }
+
+  main {
+    width: min(1080px, 100% - 2rem);
+    margin-inline: auto;
+    padding-block: 1.2rem 2rem;
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .zona-juego {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 250px;
+    gap: 1.1rem;
+    align-items: start;
+  }
+
+  .pie {
+    border-top: 1px solid var(--linea);
+    color: var(--tenue);
+    font-size: .8rem;
+  }
+  .pie-interno {
+    width: min(1080px, 100% - 2rem); margin-inline: auto;
+    padding-block: 1rem;
+    display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; justify-content: space-between;
+  }
+}
+
+@layer comps {
+  /* --- HUD --- */
+  .hud {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: .7rem;
+  }
+
+  .dato {
+    border: 1px solid var(--linea);
+    background: linear-gradient(180deg, var(--panel-alto), var(--panel));
+    padding: .6rem .75rem;
+    clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+  }
+  .dato .etiqueta-dato {
+    font-family: var(--mono); font-size: .62rem; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--tenue); display: block;
+  }
+  .dato .valor {
+    font-family: var(--display); font-size: clamp(1.2rem, 3.4vw, 1.7rem);
+    color: var(--fosforo-suave); line-height: 1.1;
+  }
+  .dato.acento .valor { color: var(--ambar); }
+
+  /* --- tablero --- */
+  .marco-tablero {
+    position: relative;
+    border: 1px solid var(--linea-fuerte);
+    background: #04100a;
+    padding: .6rem;
+    box-shadow: inset 0 0 60px rgba(74, 222, 128, .05), 0 30px 60px -34px rgba(0, 0, 0, .95);
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  }
+
+  #tablero {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: min(66dvh, 620px);
+    margin-inline: auto;
+    background: #04100a;
+    touch-action: none;      /* que el deslizamiento no haga scroll */
+  }
+
+  /* --- capas de mensaje --- */
+  .capa {
+    position: absolute; inset: .6rem;
+    display: grid; place-content: center; gap: .55rem;
+    text-align: center;
+    background: color-mix(in srgb, #04100a 82%, transparent);
+    backdrop-filter: blur(3px);
+    padding: 1rem;
+    transition: opacity .22s ease, visibility .22s ease;
+  }
+  .capa[hidden] { display: none; }
+  .capa h2 { font-size: clamp(1.4rem, 5vw, 2.3rem); color: var(--fosforo-suave); }
+  .capa p { color: var(--tenue); font-size: .95rem; }
+  .capa .destacado { font-family: var(--display); color: var(--ambar); font-size: 1.5rem; }
+  .capa .boton { justify-self: center; }
+
+  /* --- botones --- */
+  .boton {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-family: var(--display); font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; font-size: .85rem;
+    padding: .7rem 1.1rem;
+    border: 2px solid var(--fosforo);
+    background: var(--fosforo); color: #04120a;
+    cursor: pointer;
+    transition: transform .14s ease, box-shadow .14s ease, background .14s ease, color .14s ease, border-color .14s ease;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+  .boton:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 rgba(4, 10, 7, .9), 0 0 22px rgba(74, 222, 128, .4); }
+  .boton:active { transform: translate(1px, 1px); box-shadow: 2px 2px 0 rgba(4, 10, 7, .9); }
+  .boton.fantasma {
+    background: transparent; color: var(--texto);
+    border-color: var(--linea-fuerte); box-shadow: none;
+  }
+  .boton.fantasma:hover { border-color: var(--fosforo); color: var(--fosforo); box-shadow: 0 0 20px rgba(74, 222, 128, .2); }
+  .boton.pequeno { padding: .5rem .75rem; font-size: .76rem; }
+  .boton[aria-pressed="true"] { background: var(--ambar); border-color: var(--ambar); }
+
+  .barra-acciones { display: flex; gap: .45rem; align-items: center; flex-wrap: wrap; }
+  .corto { display: none; }
+  .solo-tactil { display: none; }
+
+  /* autoría: bien visible, como pidió el jefe */
+  .credito {
+    font-family: var(--mono); font-size: .7rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--fosforo);
+  }
+  .credito strong { color: var(--fosforo-suave); }
+  .pie strong { color: var(--fosforo-suave); font-weight: 500; }
+
+  /* --- columna lateral --- */
+  .lateral { display: grid; gap: .8rem; }
+
+  .caja {
+    border: 1px solid var(--linea);
+    background: linear-gradient(180deg, var(--panel-alto), var(--panel));
+    padding: .9rem;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+  .caja h3 {
+    font-family: var(--display); font-size: .78rem; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--tenue); margin-bottom: .6rem;
+  }
+  .caja .fila { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .caja .fila .boton { flex: 1 1 auto; justify-content: center; }
+
+  .ayuda { display: grid; gap: .45rem; font-size: .86rem; color: var(--tenue); }
+  .ayuda li { display: flex; align-items: center; gap: .55rem; }
+  kbd {
+    font-family: var(--mono); font-size: .72rem;
+    background: var(--fondo-2); border: 1px solid var(--linea-fuerte);
+    border-bottom-width: 3px; border-radius: 5px; padding: .12rem .4rem;
+    color: var(--fosforo-suave);
+  }
+
+  /* --- cruceta táctil --- */
+  .cruceta {
+    display: none;
+    grid-template-columns: repeat(3, 58px);
+    grid-template-rows: repeat(3, 58px);
+    gap: .4rem;
+    justify-content: center;
+  }
+  .cruceta button {
+    border: 1px solid var(--linea-fuerte);
+    background: linear-gradient(180deg, var(--panel-alto), var(--panel));
+    color: var(--fosforo);
+    font-size: 1.35rem;
+    cursor: pointer;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+  .cruceta button:active { background: var(--fosforo); color: #04120a; }
+  .cruceta .arriba { grid-area: 1 / 2; }
+  .cruceta .izq { grid-area: 2 / 1; }
+  .cruceta .centro { grid-area: 2 / 2; font-size: 1rem; }
+  .cruceta .der { grid-area: 2 / 3; }
+  .cruceta .abajo { grid-area: 3 / 2; }
+
+  .aviso-girar { display: none; }
+
+  /* destello al morir */
+  .flash { animation: destello .45s ease; }
+}
+
+@keyframes destello {
+  0%   { box-shadow: inset 0 0 0 0 rgba(248, 113, 113, 0), 0 0 0 rgba(248,113,113,0); }
+  35%  { box-shadow: inset 0 0 90px rgba(248, 113, 113, .5), 0 0 40px rgba(248, 113, 113, .35); }
+  100% { box-shadow: inset 0 0 0 0 rgba(248, 113, 113, 0), 0 0 0 rgba(248,113,113,0); }
+}
+
+/* --- adaptaciones --- */
+@media (hover: none) and (pointer: coarse) {
+  .cruceta { display: grid; }
+  /* el texto de ayuda cambia: en tactil se habla del dedo, no del teclado */
+  .solo-teclado { display: none; }
+  .solo-tactil { display: block; }
+  /* sin zoom por doble toque y sin retardo de 300 ms */
+  .boton, .cruceta button, .capa { touch-action: manipulation; }
+}
+
+@media (max-width: 900px) {
+  .zona-juego { grid-template-columns: 1fr; }
+  .hud { gap: .5rem; }
+  .lateral { grid-auto-flow: row; }
+}
+
+/* --- teléfono en vertical: cabe todo, se juega con el pulgar --- */
+@media (max-width: 620px) {
+  main { width: min(1080px, 100% - 1rem); padding-block: .5rem .8rem; gap: .5rem; }
+  .barra-interna { padding-block: .45rem; }
+  .marca { font-size: .78rem; letter-spacing: .1em; }
+  .barra-acciones .boton { padding: .4rem .55rem; font-size: .68rem; }
+
+  .hud { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .3rem; }
+  .dato { padding: .32rem .42rem; clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px); }
+  .dato .etiqueta-dato { font-size: .5rem; letter-spacing: .08em; }
+  .dato .valor { font-size: .98rem; }
+
+  .marco-tablero { padding: .4rem; }
+  /* el tablero se queda con lo que sobra: HUD arriba, acciones y cruceta abajo */
+  #tablero { max-height: calc(100dvh - 350px); }
+
+  /* barra compacta y textos de dedo */
+  .sufijo, .largo { display: none; }
+  .corto { display: inline; }
+  .solo-teclado { display: none; }
+  .solo-tactil { display: block; }
+
+  .lateral { grid-template-columns: 1fr; }
+  .lateral .caja:nth-child(2), .lateral .caja:nth-child(3) { display: none; }
+  .caja { padding: .6rem; }
+
+  .cruceta { grid-template-columns: repeat(3, minmax(58px, 82px)); grid-template-rows: repeat(3, 58px); gap: .35rem; }
+  /* en pantalla de telefono la cruceta va SIEMPRE visible (no solo si el
+     navegador declara puntero tactil) */
+  .cruceta { display: grid; }
+  .capa h2 { font-size: 1.3rem; }
+  .capa p { font-size: .85rem; }
+  .pie { font-size: .7rem; }
+  .pie-interno { padding-block: .6rem; }
+}
+
+/* --- teléfono apaisado: tablero a la izquierda, mandos a la derecha --- */
+@media (orientation: landscape) and (max-height: 560px) {
+  .barra { position: static; }
+  main { padding-block: .35rem .5rem; gap: .45rem; }
+  .zona-juego { grid-template-columns: minmax(0, 1fr) 180px; gap: .5rem; }
+  #tablero { max-height: calc(100dvh - 170px); }
+  .lateral .caja:nth-child(2), .lateral .caja:nth-child(3) { display: none; }
+  .hud { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
