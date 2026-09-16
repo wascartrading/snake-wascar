@@ -146,7 +146,11 @@
     const total = datos.jugadores === 1
       ? "1 jugador" : (datos.jugadores || 0) + " jugadores";
     let linea = total + " en el ranking global";
-    if (miPuesto) linea += " · usted va " + miPuesto + "º";
+    /* El puesto guardado solo se enseña si sigue habiendo lista y cabe en
+       ella: si se limpió el ranking, su puesto viejo ya no significa nada. */
+    if (miPuesto && datos.jugadores && miPuesto <= datos.jugadores) {
+      linea += " · usted va " + miPuesto + "º";
+    }
     return linea;
   }
 
