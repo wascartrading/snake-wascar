@@ -116,6 +116,15 @@
     animation: latido 2.4s ease-in-out infinite;
   }
 
+  /* La marca es un enlace (orden del jefe, 16/09/2026): al pulsarla, a la
+     página principal. Mismo aspecto, pero se nota que se puede pulsar. */
+  a.marca { color: inherit; text-decoration: none; transition: color .18s ease; }
+  a.marca:hover, a.marca:focus-visible { color: var(--fosforo); }
+  a.marca:hover .punto { box-shadow: 0 0 24px var(--fosforo); }
+  .titulo-grande a { color: inherit; text-decoration: none; }
+  .titulo-grande a:hover { text-shadow: 0 0 42px rgba(74, 222, 128, .5); }
+  .titulo-grande a:focus-visible { outline: 2px solid var(--fosforo); outline-offset: .1em; }
+
   .barra nav { display: flex; gap: 1.4rem; font-size: .9rem; color: var(--tenue); }
   .barra nav a { transition: color .18s ease; }
   .barra nav a:hover { color: var(--fosforo); }

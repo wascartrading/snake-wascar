@@ -77,6 +77,12 @@
     box-shadow: 0 0 14px var(--fosforo);
   }
 
+  /* La marca es un enlace (orden del jefe, 16/09/2026): pulsándola se vuelve
+     a la página principal. Mismo aspecto, pero se nota que se puede pulsar. */
+  a.marca { color: inherit; text-decoration: none; transition: color .18s ease; }
+  a.marca:hover, a.marca:focus-visible { color: var(--fosforo); }
+  a.marca:hover .punto { box-shadow: 0 0 24px var(--fosforo); }
+
   main {
     width: min(1180px, 100% - 2rem);
     margin-inline: auto;
