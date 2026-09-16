@@ -27,6 +27,8 @@ const btnPausa = document.getElementById("btn-pausa");
 
 /* ---------- estado ---------- */
 let serpiente = [];
+let serpientePrevia = [];              // donde estaba cada tramo antes del paso
+let alfaActual = 0;                    // progreso del paso, congelado al morir
 let direccion = { x: 1, y: 0 };
 let giros = [];                        // giros en cola (para no perder ninguno)
 let fruta = { x: 0, y: 0 };
@@ -77,6 +79,8 @@ function nuevaPartida() {
   tPaso = PASO_BASE;
   tAcum = 0;
   particulas = [];
+  serpientePrevia = serpiente.map((p) => ({ x: p.x, y: p.y }));
+  alfaActual = 1;
   ponerFruta();
   actualizarHUD();
   pintarCapa("inicio");
@@ -108,6 +112,7 @@ function pintarCapa(cual) {
 
 /* ---------- avance de un paso ---------- */
 function avanzar() {
+  serpientePrevia = serpiente.map((p) => ({ x: p.x, y: p.y }));
   if (giros.length) {
     const g = giros.shift();
     if (!(g.x === -direccion.x && g.y === -direccion.y)) direccion = g;
@@ -184,13 +189,6 @@ function moverParticulas(dt) {
   particulas.forEach((p) => { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.94; p.vy *= 0.94; });
 }
 
-/* ---------- dibujo ---------- */
-function redondo(x, y, w, h, r) {
-  ctx.beginPath();
-  if (typeof ctx.roundRect === "function") ctx.roundRect(x, y, w, h, r);
-  else ctx.rect(x, y, w, h);
-}
-
 function dibujar(alfa) {
   const L = lado();
   const c = celda();
@@ -237,48 +235,72 @@ function dibujar(alfa) {
   ctx.quadraticCurveTo(fx + c * 0.16, fy - c * 0.5, fx + c * 0.3, fy - c * 0.34);
   ctx.stroke();
 
-  // serpiente: la cinta entera se desliza hacia delante, sin huecos
-  // (cada tramo avanza hacia donde está el de delante; así la cabeza
-  //  nunca se despega del cuerpo)
-  const cuerpo = serpiente.map((p, i) => {
-    if (i === 0) return { x: p.x + direccion.x * alfa, y: p.y + direccion.y * alfa };
-    const ant = serpiente[i - 1];
-    return { x: p.x + (ant.x - p.x) * alfa, y: p.y + (ant.y - p.y) * alfa };
-  });
-
-  // grosor uniforme: mismo margen para cabeza y cuerpo (van pegados)
-  const margen = c * 0.045;
-  for (let i = cuerpo.length - 1; i >= 0; i--) {
-    const p = cuerpo[i];
-    const t = i / Math.max(cuerpo.length - 1, 1);
-    const esCabeza = i === 0;
-
-    if (esCabeza) {
-      ctx.save();
-      ctx.shadowColor = "rgba(74,222,128,.75)";
-      ctx.shadowBlur = 16;
-    }
-    ctx.fillStyle = esCabeza
-      ? "#86efac"
-      : `rgb(${Math.round(38 + t * 40)}, ${Math.round(214 - t * 96)}, ${Math.round(132 - t * 46)})`;
-    redondo(p.x * c + margen, p.y * c + margen, c - margen * 2, c - margen * 2, esCabeza ? c * 0.28 : c * 0.2);
-    ctx.fill();
-    if (esCabeza) ctx.restore();
+  // ---- la culebrita: una cinta continua curvada ----
+  // Cada tramo se dibuja entre su celda anterior y la actual: TODA la
+  // serpiente avanza al mismo ritmo (nada se despega) y el giro nace en
+  // la cabeza, que es la punta de la cinta.
+  const n = serpiente.length;
+  const puntos = [];
+  for (let i = 0; i < n; i++) {
+    const act = serpiente[i];
+    const prev = serpientePrevia[i] || serpientePrevia[serpientePrevia.length - 1] || act;
+    puntos.push({
+      x: (prev.x + (act.x - prev.x) * alfa + 0.5) * c,
+      y: (prev.y + (act.y - prev.y) * alfa + 0.5) * c,
+    });
   }
 
-  // ojos
-  const cab = cuerpo[0];
-  const cx = (cab.x + .5) * c;
-  const cy = (cab.y + .5) * c;
-  const sep = c * 0.2;
-  const adelante = c * 0.17;
+  const cabezaPt = puntos[0];
+  const colaPt = puntos[puntos.length - 1];
+
+  ctx.save();
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.lineWidth = c * 0.84;
+
+  // degradado a lo largo del cuerpo: cola apagada, cabeza luminosa
+  const deg = ctx.createLinearGradient(colaPt.x, colaPt.y, cabezaPt.x, cabezaPt.y);
+  deg.addColorStop(0, "#1c7f47");
+  deg.addColorStop(0.5, "#2fc46a");
+  deg.addColorStop(1, "#86efac");
+  ctx.strokeStyle = deg;
+  ctx.shadowColor = "rgba(74,222,128,.40)";
+  ctx.shadowBlur = 12;
+
+  // trazo con curvas suaves: los giros se redondean y salen desde la cabeza
+  ctx.beginPath();
+  ctx.moveTo(colaPt.x, colaPt.y);
+  for (let i = n - 2; i >= 1; i--) {
+    const mx = (puntos[i].x + puntos[i - 1].x) / 2;
+    const my = (puntos[i].y + puntos[i - 1].y) / 2;
+    ctx.quadraticCurveTo(puntos[i].x, puntos[i].y, mx, my);
+  }
+  ctx.lineTo(cabezaPt.x, cabezaPt.y);
+  ctx.stroke();
+  ctx.restore();
+
+  // la cabeza: la punta de la cinta, más clara y con brillo
+  ctx.save();
+  ctx.fillStyle = "#b9f7d3";
+  ctx.shadowColor = "rgba(134,239,172,.85)";
+  ctx.shadowBlur = 16;
+  ctx.beginPath();
+  ctx.arc(cabezaPt.x, cabezaPt.y, c * 0.42, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // ojos (mirando hacia donde va)
+  const sep = c * 0.17;
+  const adelante = c * 0.14;
+  const px2 = direccion.x !== 0 ? adelante * direccion.x : 0;
+  const py2 = direccion.y !== 0 ? adelante * direccion.y : 0;
   ctx.fillStyle = "#04120a";
   const ojos = direccion.x !== 0
-    ? [[cx + adelante * direccion.x, cy - sep], [cx + adelante * direccion.x, cy + sep]]
-    : [[cx - sep, cy + adelante * direccion.y], [cx + sep, cy + adelante * direccion.y]];
+    ? [[cabezaPt.x + px2, cabezaPt.y - sep], [cabezaPt.x + px2, cabezaPt.y + sep]]
+    : [[cabezaPt.x - sep, cabezaPt.y + py2], [cabezaPt.x + sep, cabezaPt.y + py2]];
   ojos.forEach(([ox, oy]) => {
     ctx.beginPath();
-    ctx.arc(ox, oy, Math.max(1.6, c * 0.09), 0, Math.PI * 2);
+    ctx.arc(ox, oy, Math.max(1.6, c * 0.085), 0, Math.PI * 2);
     ctx.fill();
   });
 
@@ -305,9 +327,10 @@ function bucle(ahora) {
       tAcum -= tPaso;
       avanzar();
     }
+    if (estado === "jugando") alfaActual = Math.min(tAcum / tPaso, 1);
   }
   moverParticulas(dt);
-  dibujar(estado === "jugando" ? Math.min(tAcum / tPaso, 1) : 0);
+  dibujar(alfaActual);
   requestAnimationFrame(bucle);
 }
 
