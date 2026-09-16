@@ -36,6 +36,30 @@
     <div class="marco-tablero" id="marco">
       <canvas id="tablero" width="720" height="720" aria-label="Tablero del juego de la culebrita"></canvas>
 
+      <!-- capa de nombre (la primera vez) -->
+      <div class="capa" id="capa-nombre" hidden>
+        <h2>¿Cómo te llamas?</h2>
+        <p>Su nombre entra al ranking global de la culebrita.</p>
+        <form class="form-nombre" id="form-nombre" autocomplete="off">
+          <input class="campo" id="campo-nombre" type="text" maxlength="12" placeholder="Su nombre" aria-label="Su nombre" autocapitalize="words">
+          <button class="boton" id="btn-guardar-nombre" type="submit">Guardar y jugar</button>
+        </form>
+        <p class="aviso" id="aviso-nombre" hidden></p>
+        <p class="credito">Creado por <strong>Wáscar</strong> · construido por <strong>JARVIS</strong></p>
+      </div>
+
+      <!-- capa del ranking -->
+      <div class="capa capa-lista" id="capa-ranking" hidden>
+        <h2>Ranking global</h2>
+        <p class="sub" id="ranking-sub">Cargando…</p>
+        <ul class="ranking" id="ranking-lista"></ul>
+        <p class="aviso" id="aviso-ranking" hidden></p>
+        <div class="fila">
+          <button class="boton fantasma pequeno" id="btn-ranking-refrescar" type="button">Actualizar</button>
+          <button class="boton pequeno" id="btn-ranking-cerrar" type="button">Cerrar</button>
+        </div>
+      </div>
+
       <!-- capa de inicio -->
       <div class="capa" id="capa-inicio">
         <h2>¿Listo, jefe?</h2>
@@ -58,6 +82,7 @@
         <p>Puntuación de esta partida</p>
         <p class="destacado" id="fin-puntos">0</p>
         <p id="fin-mensaje">¡Buen intento!</p>
+        <p class="puesto" id="fin-ranking"></p>
         <button class="boton" id="btn-otra" type="button">Jugar otra vez</button>
       </div>
     </div>
@@ -69,7 +94,14 @@
           <button class="boton fantasma pequeno" id="btn-pausa" type="button">Pausa</button>
           <button class="boton fantasma pequeno" id="btn-reiniciar" type="button">Reiniciar</button>
           <button class="boton fantasma pequeno" id="btn-sonido" type="button" aria-pressed="false">Sonido: sí</button>
+          <button class="boton fantasma pequeno" id="btn-ranking" type="button">🏆 Ranking</button>
         </div>
+      </div>
+
+      <div class="caja">
+        <h3>Jugador</h3>
+        <p class="quien" id="quien">—</p>
+        <button class="boton fantasma pequeno" id="btn-cambiar-nombre" type="button">Cambiar nombre</button>
       </div>
 
       <div class="caja">
@@ -110,6 +142,7 @@
   </div>
 </footer>
 
-<script src="js/juego.js?v=2" defer></script>
+<script src="js/ranking.js?v=3" defer></script>
+<script src="js/juego.js?v=3" defer></script>
 </body>
 </html>

@@ -32,6 +32,7 @@ let alfaActual = 0;                    // progreso del paso, congelado al morir
 let direccion = { x: 1, y: 0 };
 let giros = [];                        // giros en cola (para no perder ninguno)
 let fruta = { x: 0, y: 0 };
+let frutaPendiente = null;   // manzana que la cabeza ya tocó y se cobra al dibujarse
 let puntos = 0;
 let nivel = 1;
 let tPaso = PASO_BASE;
@@ -79,6 +80,7 @@ function nuevaPartida() {
   tPaso = PASO_BASE;
   tAcum = 0;
   particulas = [];
+  frutaPendiente = null;
   serpientePrevia = serpiente.map((p) => ({ x: p.x, y: p.y }));
   alfaActual = 1;
   ponerFruta();
@@ -104,15 +106,60 @@ function actualizarHUD() {
   elVelocidad.textContent = (PASO_BASE / tPaso).toFixed(1) + "x";
 }
 
+const capaNombre = document.getElementById("capa-nombre");
+const capaRanking = document.getElementById("capa-ranking");
+
 function pintarCapa(cual) {
   capaInicio.hidden = cual !== "inicio";
   capaPausa.hidden = cual !== "pausa";
   capaFin.hidden = cual !== "fin";
+  if (capaNombre) capaNombre.hidden = cual !== "nombre";
+  if (capaRanking) capaRanking.hidden = cual !== "ranking";
 }
+
+/* el módulo del ranking (ranking.js) usa estas tres puertas */
+let bloqueado = false;          // mientras se pide el nombre, el juego no arranca
+let estabaJugando = false;
+
+window.pintarCapaJuego = pintarCapa;
+window.bloquearJuego = (valor) => { bloqueado = Boolean(valor); };
+window.pausarSiJugando = () => {
+  estabaJugando = estado === "jugando";
+  if (estabaJugando) estado = "pausado";
+};
+window.alCerrarRanking = () => {
+  if (estabaJugando) {
+    estabaJugando = false;
+    pintarCapa("pausa");
+  } else if (estado === "pausado") {
+    pintarCapa("pausa");
+  } else if (estado === "fin") {
+    pintarCapa("fin");
+  } else {
+    pintarCapa("inicio");
+  }
+};
 
 /* ---------- avance de un paso ---------- */
 function avanzar() {
   serpientePrevia = serpiente.map((p) => ({ x: p.x, y: p.y }));
+
+  // El dibujo va un paso por detrás de la cabeza lógica. Por eso la manzana
+  // se cobra AQUÍ, al empezar el paso siguiente: es justo el instante en que
+  // la cabeza dibujada llega a la manzana. Así el punto cuenta cuando la
+  // cabeza la toca, no cuando la toca el cuello.
+  if (frutaPendiente) {
+    const m = frutaPendiente;
+    frutaPendiente = null;
+    puntos++;
+    crearParticulas(m.x, m.y);
+    sonando(560 + Math.min(puntos, 12) * 28, 0.07, "square", 0.05);
+    nivel = 1 + Math.floor(puntos / CADA_NIVEL);
+    tPaso = Math.max(PASO_MIN, PASO_BASE - (nivel - 1) * 0.007);
+    ponerFruta();
+    actualizarHUD();
+  }
+
   if (giros.length) {
     const g = giros.shift();
     if (!(g.x === -direccion.x && g.y === -direccion.y)) direccion = g;
@@ -131,13 +178,9 @@ function avanzar() {
   serpiente.unshift(cabeza);
 
   if (cabeza.x === fruta.x && cabeza.y === fruta.y) {
-    puntos++;
-    crearParticulas(fruta.x, fruta.y);
-    sonando(560 + Math.min(puntos, 12) * 28, 0.07, "square", 0.05);
-    nivel = 1 + Math.floor(puntos / CADA_NIVEL);
-    tPaso = Math.max(PASO_MIN, PASO_BASE - (nivel - 1) * 0.007);
-    ponerFruta();
-    actualizarHUD();
+    // la cabeza ya está en la manzana: crece ahora, y el punto y la manzana
+    // nueva se cobran cuando la cabeza dibujada llegue a tocarla
+    frutaPendiente = { x: fruta.x, y: fruta.y };
   } else {
     serpiente.pop();
   }
@@ -167,6 +210,7 @@ function morir(causa) {
   elRecord.textContent = String(record);
   actualizarHUD();
   pintarCapa("fin");
+  if (window.Ranking) window.Ranking.alMorir(puntos);   // guarda el puesto en el ranking
 }
 
 /* ---------- partículas ---------- */
@@ -363,6 +407,7 @@ function pedirGiro(nueva) {
 }
 
 function empezar() {
+  if (bloqueado) return;               // se está pidiendo el nombre
   if (estado === "jugando") return;
   if (estado === "fin" || estado === "listo") {
     if (estado === "fin") nuevaPartida();
@@ -480,6 +525,7 @@ document.addEventListener("visibilitychange", () => {
 nuevaPartida();
 requestAnimationFrame(bucle);
 actualizarHUD();
+if (window.Ranking) window.Ranking.alArrancar();   // nombre y ranking global
 
 /* puente para comprobaciones automáticas */
 window.__snake = {
@@ -495,6 +541,17 @@ window.__snake = {
   girar: pedirGiro,
   fruta: () => ({ ...fruta }),
   cabeza: () => ({ ...serpiente[0] }),
+  /* dónde está dibujada la cabeza AHORA (para comprobar que el punto cae
+     justo cuando la cabeza toca la manzana) */
+  cabezaDibujo: () => {
+    const act = serpiente[0];
+    const prev = serpientePrevia[0] || act;
+    return {
+      x: prev.x + (act.x - prev.x) * alfaActual,
+      y: prev.y + (act.y - prev.y) * alfaActual,
+    };
+  },
+  pendiente: () => (frutaPendiente ? { ...frutaPendiente } : null),
   tablero: () => COLS,
   colocarFruta: (x, y) => { fruta = { x, y }; },   // para las pruebas automáticas
   /* avanza el juego sin depender del dibujo ni del reloj (pruebas automáticas) */

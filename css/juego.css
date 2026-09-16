@@ -316,10 +316,80 @@
   main { padding-block: .35rem .5rem; gap: .45rem; }
   .zona-juego { grid-template-columns: minmax(0, 1fr) 180px; gap: .5rem; }
   #tablero { max-height: calc(100dvh - 170px); }
-  .lateral .caja:nth-child(2), .lateral .caja:nth-child(3) { display: none; }
+  .lateral .caja:nth-child(3), .lateral .caja:nth-child(4) { display: none; }
   .hud { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+/* --- nombre del jugador y ranking global --- */
+@layer comps {
+  .form-nombre {
+    display: grid; gap: .5rem;
+    justify-self: center; width: min(270px, 100%);
+    margin-top: .2rem;
+  }
+  .campo {
+    width: 100%;
+    font-family: var(--display); font-size: 1.05rem; letter-spacing: .04em;
+    color: var(--fosforo-suave); background: #04120a;
+    border: 2px solid var(--linea-fuerte);
+    padding: .65rem .8rem; text-align: center;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+  .campo::placeholder { color: #48685a; }
+  .campo:focus { outline: none; border-color: var(--fosforo); box-shadow: 0 0 22px rgba(74, 222, 128, .22); }
+
+  .aviso {
+    font-family: var(--mono); font-size: .78rem; letter-spacing: .03em;
+    color: var(--ambar); max-width: 30ch; margin-inline: auto;
+  }
+
+  .puesto { font-family: var(--mono); font-size: .76rem; color: var(--fosforo); }
+
+  .capa-lista { align-content: center; }
+  .capa-lista .sub { font-size: .8rem; }
+  .capa-lista .fila { display: flex; gap: .5rem; justify-content: center; margin-top: .3rem; }
+
+  .ranking {
+    list-style: none; padding: 0; margin: .2rem auto 0;
+    width: min(370px, 100%);
+    max-height: min(48vh, 330px); overflow-y: auto;
+    display: grid; gap: 3px; text-align: left;
+  }
+  .ranking li {
+    display: grid; grid-template-columns: 1.9rem 1fr auto;
+    align-items: center; gap: .5rem;
+    padding: .4rem .6rem;
+    background: rgba(12, 23, 20, .8);
+    border: 1px solid var(--linea);
+    font-size: .84rem; line-height: 1.2;
+  }
+  .ranking li .pos { font-family: var(--mono); font-size: .76rem; color: var(--tenue); }
+  .ranking li .nom {
+    color: var(--texto);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .ranking li .pts { font-family: var(--display); color: var(--fosforo-suave); }
+  .ranking li.yo { border-color: var(--fosforo); background: rgba(74, 222, 128, .13); }
+  .ranking li.yo .nom { color: var(--fosforo-suave); }
+  .ranking li.vacio {
+    grid-template-columns: 1fr; justify-items: center;
+    color: var(--tenue); text-align: center;
+  }
+
+  .quien {
+    font-family: var(--display); font-size: .95rem;
+    color: var(--fosforo-suave); margin-bottom: .55rem;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+}
+
+@media (max-width: 620px) {
+  .capa h2 { font-size: 1.25rem; }
+  .form-nombre { width: min(235px, 100%); }
+  .ranking { max-height: 42vh; width: 100%; }
+  .ranking li { font-size: .8rem; padding: .36rem .5rem; }
 }
